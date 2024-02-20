@@ -16,7 +16,6 @@ mongoose.connect("mongodb://localhost:27017/MERN", {
   useUnifiedTopology: true,
 });
 
-// MongoDB schema and model
 const productSchema = new mongoose.Schema({
   id: Number,
   title: String,
@@ -30,13 +29,10 @@ const productSchema = new mongoose.Schema({
 
 const Product = mongoose.model("Product", productSchema);
 
-// CORS middleware
 app.use(cors());
 
-// Endpoint to fetch data from the external API and store it in MongoDB
 app.get("/fetch-and-save", async (req, res) => {
   try {
-    // Fetch data from the external API
     const apiResponse = await axios.get(
       "https://s3.amazonaws.com/roxiler.com/product_transaction.json"
     );
@@ -61,24 +57,21 @@ app.get("/transactions", async (req, res) => {
   try {
     const { search, page = 1, perPage = 10 } = req.query;
 
-    // Define pagination options
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(perPage, 10),
     };
 
-    // Define search criteria based on the presence of the search parameter
     const searchCriteria = search
       ? {
           $or: [
-            { title: { $regex: search, $options: "i" } }, // Case-insensitive search on title
-            { description: { $regex: search, $options: "i" } }, // Case-insensitive search on description
-            { price: { $regex: search, $options: "i" } }, // Case-insensitive search on price (assuming price is a string)
+            { title: { $regex: search, $options: "i" } },
+            { description: { $regex: search, $options: "i" } },
+            { price: { $regex: search, $options: "i" } },
           ],
         }
       : {};
 
-    // Perform the MongoDB query with pagination and search criteria
     const transactions = await Product.paginate(searchCriteria, options);
 
     res.json(transactions);
@@ -92,11 +85,9 @@ app.get("/statistics", async (req, res) => {
   try {
     const { selectedMonth } = req.query;
 
-    // Parse the selectedMonth to a JavaScript Date object
     const selectedDate = new Date(selectedMonth);
     console.log("Selected Month:", selectedMonth);
 
-    // Calculate the start and end dates of the selected month
     const startDate = new Date(
       selectedDate.getFullYear(),
       selectedDate.getMonth(),
@@ -206,7 +197,7 @@ app.get("/bar-chart", async (req, res) => {
 
     res.json(barChartData);
   } catch (error) {
-    console.error(error); // Log the error for further inspection
+    console.error(error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
@@ -215,10 +206,8 @@ app.get("/pie-chart", async (req, res) => {
   try {
     const { selectedMonth } = req.query;
 
-    // Parse the selectedMonth to a JavaScript Date object
     const selectedDate = new Date(selectedMonth);
 
-    // Calculate the start and end dates of the selected month
     const startDate = new Date(
       selectedDate.getFullYear(),
       selectedDate.getMonth(),

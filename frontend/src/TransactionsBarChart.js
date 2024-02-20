@@ -1,4 +1,3 @@
-// TransactionsBarChart.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Bar } from "react-chartjs-2";
